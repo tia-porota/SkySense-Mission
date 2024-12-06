@@ -31,6 +31,6 @@ Components used in our mission:
 ## Code Authors
 
 - [Oviedo Verónica](https://www.github.com/tia-porota)
-- [Maccari Valentino](https://www.github.com/tia-porota)
+- [Maccari Valentino](https://github.com/ValentinoMaccari)
 
 [CodeChemSat](https://www.instagram.com/codechemsat/) 2023
