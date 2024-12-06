@@ -1,0 +1,7 @@
+4 archivos, la última versión es "CCS_Graph_Excel_Def.py", por lo que es la única documentada, trabaja con ciertas librerías que deberán descargar para poder utilizar.
+Asegurense de mover el archivo Excel cuando hagan varias pruebas, al iniciar el programa, pregunta si desean eliminarlo para poder empezar a registrar nuevos datos.
+Se recomienda ampliamente ejecutarlos con el editor de código gratuito "Thonny".
+
+
+ Programado y testeado por Oviedo Verónica y Maccari Valentino.
+ Contacto: veroviedo935@gmail.com

@@ -1,0 +1,6 @@
+Ambos programas cumplen con el propósito de testear cada módulo sensor, para no tener que cargar
+con 2 LORA de envío y recepción de datos, los mismos no se encuentran documentados por lo dicho anteriormente,
+cualquier duda o consulta dejamos nuestro contacto.
+
+Programado y testeado por Oviedo Verónica y Maccari Valentino.
+Contacto: veroviedo935@gmail.com

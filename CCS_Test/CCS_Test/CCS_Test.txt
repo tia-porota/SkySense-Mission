@@ -1,0 +1,120 @@
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
+#include <TinyGPS++.h>
+#include "heltec.h" 
+#include "images.h"
+#include "MQ4.h"
+#include "MQ135.h"
+float t,p,a,m,c,lon,lat = 0.0;
+TinyGPSPlus gps;
+#define BAND    915E6  //you can set band here directly,e.g. 868E6,915E6
+Adafruit_BMP085 bmp;
+MQ4 mq4(36,3.3); // mq4(pin,voltaje) cambiar voltaje a 3.3 o a 5 según si el ESP32 funciona a cable o a batería
+MQ135 mq135(37,3.3);
+
+
+void logo(){
+  Heltec.display->clear();
+  Heltec.display->drawXbm(0,5,logo_width,logo_height,logo_bits);
+  Heltec.display->display();
+}
+
+
+float a0;
+void setup() { 
+   //WIFI Kit series V1 not support Vext control
+  Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.Heltec.Heltec.LoRa Disable*/, false /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
+  Wire.begin(4,15);
+  Serial2.begin(9600,SERIAL_8N1,13,12);
+  Serial.begin(9600);
+  if (!bmp.begin()){
+    Serial.println("Fallo al iniciar BMP180 :(");
+    while (true) {}
+  }
+  a0 = bmp.readAltitude(102900);
+  
+ // Serial.println("Calibración inicial del MQ4");
+  mq4.calibrate();
+  mq135.calibrate();
+ // Serial.println("Calibración terminada");
+ // Serial.println("");
+
+  Heltec.display->init();
+  Heltec.display->flipScreenVertically();  
+  Heltec.display->setFont(ArialMT_Plain_10);
+  logo();
+  delay(1500);
+  Heltec.display->clear();
+
+  
+}
+	int pos1,pos2;
+	
+  String Spresion,Stemperatura,msg;
+void mostrar(String temp, String presion, String altura, String alturaInit){
+    Heltec.display->clear();
+    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+    Heltec.display->setFont(ArialMT_Plain_10);
+    Heltec.display->drawString(0 , 0 , "Lat: " + temp + " °C");
+    Heltec.display->drawString(0 , 15 , "Long: " + presion + " hPa");
+    Heltec.display->drawString(0, 30, "Altura: " + altura + "m");
+    Heltec.display->drawString(0, 45, "Metano en el aire: " + alturaInit + " ppm");
+    Heltec.display->display();
+    //Serial.println(packet);
+}
+
+int intentos = 0;
+void loop() {
+  t = bmp.readTemperature();
+  p = bmp.readPressure()/100.0;
+  a = bmp.readAltitude(102900);
+  a-=a0;
+  m = mq4.readPpm();
+  c = mq135.readPpm();
+  delay(150);
+
+  if (Serial2.available() && gps.encode(Serial2.read())){
+    //  Serial.print(F("Location: ")); 
+    if (gps.location.isValid())
+    {
+      lat = gps.location.lat();
+      lon = gps.location.lng();
+    }
+  else
+  {
+    intentos++;
+    if (intentos>=2){
+      Serial2.end();
+      Serial2.begin(9600,SERIAL_8N1,13,12);
+      delay(50);
+      Serial.println("REBOOT");
+      intentos=0;
+
+    }
+    // error D:
+  }
+    
+  }
+  delay(50);
+
+  
+
+  delay(800);
+  mostrar(String(lat,6),String(lon,6),String(a),String(m));
+  delay(10);
+  Serial.print(t);
+  Serial.print(",");
+  Serial.print(p);
+  Serial.print(",");
+  Serial.print(lat,6);
+  Serial.print(",");
+  Serial.print(lon,6);
+  Serial.print(",");
+  Serial.print(c);
+  Serial.print(",");
+  Serial.print(a0);
+  Serial.println();
+
+
+
+}
